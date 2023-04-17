@@ -2,7 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-# Headers to pass to the request to avoid CAPTCHA
+url = "https://www.amazon.com/s?k=earplugs&ref=nb_sb_noss"
+
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -12,49 +13,21 @@ headers = {
     'Connection': 'keep-alive'
 }
 
-# URL of the Amazon page to scrape
-url = "https://www.amazon.com/s?k=earplugs&ref=nb_sb_noss"
-
-# Make a GET request to the URL and get the HTML content
 response = requests.get(url, headers=headers)
-content = response.content
+soup = BeautifulSoup(response.content, 'html.parser')
 
-# Parse the HTML content using BeautifulSoup
-soup = BeautifulSoup(content, 'html.parser')
-
-# Find all the product containers on the page
-product_containers = soup.find_all('div', {'class': 's-result-item'})
-# Initialize an empty list to store the product details
-product_details = []
-
-# Loop through each product container and extract details
-# extract details of only the first 40 products
-for container in product_containers[:40]:
-    # Extract the product name
-    name = getattr(container.find('h2'), 'text', None)
-
-    # Extract the product price
-    price_container = container.find('span', {'class': 'a-offscreen'})
-    if price_container:
-        price = price_container.text.strip()
+products = []
+for idx, product in enumerate(soup.find_all('div', {'data-component-type': 's-search-result'})):
+    product_name = product.h2.a.text.strip()
+    product_url = "https://www.amazon.com" + product.h2.a.get('href')
+    product_price = product.find('span', {'class': 'a-offscreen'})
+    if product_price is None:
+        product_price = 'Not available'
     else:
-        price = "N/A"
+        product_price = product_price.text
+    products.append({'Product Name': product_name,
+                    'URL': product_url, 'Price': product_price})
+    print(f"{idx+1}) Product Name: {product_name}, URL: {product_url}, Price: {product_price}")
 
-    # Extract the product rating
-    rating_container = container.find('span', {'class': 'a-icon-alt'})
-    if rating_container:
-        rating = rating_container.text.strip()
-    else:
-        rating = "N/A"
-
-    # Add the product details to the list
-    product_details.append({'Name': name, 'Price': price, 'Rating': rating})
-
-# Create a Pandas dataframe from the product details list
-df = pd.DataFrame(product_details)
-
-# Print the dataframe to the console
-print(df.to_string(index=False))
-
-# Export the dataframe to an Excel file
-df.to_excel('product_details.xlsx', index=False)
+df = pd.DataFrame(products)
+df.to_excel('amazon_products.xlsx', index=False)
