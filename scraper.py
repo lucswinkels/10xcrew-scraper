@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 # URL of the Amazon page to scrape
 url = "https://www.amazon.com/dp/B00X4WHP5E"
@@ -13,6 +14,9 @@ soup = BeautifulSoup(content, 'html.parser')
 
 # Find all the product containers on the page
 product_containers = soup.find_all('div', {'class': 's-result-item'})
+
+# Initialize an empty list to store the product details
+product_details = []
 
 # Loop through each product container and extract details
 # extract details of only the first 40 products
@@ -34,8 +38,11 @@ for container in product_containers[:40]:
     else:
         rating = "N/A"
 
-    # Print the product details
-    print("Product name: ", name)
-    print("Product price: ", price)
-    print("Product rating: ", rating)
-    print("---------")
+    # Add the product details to the list
+    product_details.append({'Name': name, 'Price': price, 'Rating': rating})
+
+# Create a Pandas dataframe from the product details list
+df = pd.DataFrame(product_details)
+
+# Export the dataframe to an Excel file
+df.to_excel('product_details.xlsx', index=False)
