@@ -2,16 +2,26 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+# Headers to pass to the request to avoid CAPTCHA
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Referer': 'https://www.google.com/',
+    'Connection': 'keep-alive'
+}
+
 # URL of the Amazon page to scrape
-url = "https://www.amazon.com/Eargasm-Musicians-Motorcycles-Sensitivity-Conditions/dp/B019M576XW/ref=sr_1_9?crid=3TJTCL31OEHGC&keywords=Motorcycle%2BEar%2BPlugs&qid=1681721023&sprefix=motorcycle%2Bear%2Bplugs%2Caps%2C173&sr=8-9&th=1"
+url = "https://www.amazon.com/EARPEACE-Moto-Hearing-Protection-Earplugs/dp/B076VVV5WJ"
 
 # Make a GET request to the URL and get the HTML content
-response = requests.get(url)
-content = response.content
-print(content)
+response = requests.get(url, headers=headers)
+content = response.text
+
 # Parse the HTML content using BeautifulSoup
 soup = BeautifulSoup(content, 'html.parser')
-# print(soup.prettify())
+
 # Find all the product containers on the page
 product_containers = soup.find_all('div', {'class': 's-result-item'})
 
@@ -19,8 +29,8 @@ product_containers = soup.find_all('div', {'class': 's-result-item'})
 product_details = []
 
 # Loop through each product container and extract details
-# extract details of only the first 40 products
-for container in product_containers[:40]:
+# extract details of only the first 10 products
+for container in product_containers[:10]:
     # Extract the product name
     name = container.find('h2').text.strip()
 
