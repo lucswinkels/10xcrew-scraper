@@ -6,7 +6,7 @@ url = "https://www.amazon.com/dp/B00X4WHP5E"
 
 # Make a GET request to the URL and get the HTML content
 response = requests.get(url)
-content = response.content
+content = response.content hahahhshsh
 
 # Parse the HTML content using BeautifulSoup
 soup = BeautifulSoup(content, 'html.parser')
