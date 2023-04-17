@@ -15,24 +15,25 @@ soup = BeautifulSoup(content, 'html.parser')
 product_containers = soup.find_all('div', {'class': 's-result-item'})
 
 # Loop through each product container and extract details
-for container in product_containers[:40]: # extract details of only the first 40 products
+# extract details of only the first 40 products
+for container in product_containers[:40]:
     # Extract the product name
     name = container.find('h2').text.strip()
-    
+
     # Extract the product price
     price_container = container.find('span', {'class': 'a-offscreen'})
     if price_container:
         price = price_container.text.strip()
     else:
         price = "N/A"
-    
+
     # Extract the product rating
     rating_container = container.find('span', {'class': 'a-icon-alt'})
     if rating_container:
         rating = rating_container.text.strip()
     else:
         rating = "N/A"
-    
+
     # Print the product details
     print("Product name: ", name)
     print("Product price: ", price)
