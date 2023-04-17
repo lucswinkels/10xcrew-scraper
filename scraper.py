@@ -13,26 +13,25 @@ headers = {
 }
 
 # URL of the Amazon page to scrape
-url = "https://www.amazon.com/EARPEACE-Moto-Hearing-Protection-Earplugs/dp/B076VVV5WJ"
+url = "https://www.amazon.com/s?k=earplugs&ref=nb_sb_noss"
 
 # Make a GET request to the URL and get the HTML content
 response = requests.get(url, headers=headers)
-content = response.text
+content = response.content
 
 # Parse the HTML content using BeautifulSoup
 soup = BeautifulSoup(content, 'html.parser')
 
 # Find all the product containers on the page
 product_containers = soup.find_all('div', {'class': 's-result-item'})
-
 # Initialize an empty list to store the product details
 product_details = []
 
 # Loop through each product container and extract details
-# extract details of only the first 10 products
-for container in product_containers[:10]:
+# extract details of only the first 40 products
+for container in product_containers[:40]:
     # Extract the product name
-    name = container.find('h2').text.strip()
+    name = getattr(container.find('h2'), 'text', None)
 
     # Extract the product price
     price_container = container.find('span', {'class': 'a-offscreen'})
