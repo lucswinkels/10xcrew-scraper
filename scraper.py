@@ -2,13 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-ahrefs_api_baseurl = "https://api.ahrefs.com/v3"
-ahrefs_headers = {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer undefined"
-}
-# TODO: Get ahrefs API key and add it to ahrefs_headers
-
 amazon_url = "https://www.amazon.com/s?k=earplugs&ref=nb_sb_noss"
 
 amazon_headers = {
@@ -25,6 +18,10 @@ amazon_soup = BeautifulSoup(amazon_response.content, 'html.parser')
 
 products = []
 for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type': 's-search-result'})):
+    if product.find('a', {'class': 'puis-sponsored-label-text'}):
+        product_sponsored = "Sponsored"
+    else:
+        product_sponsored = " "
     product_name = product.h2.a.text.strip()
     product_url = "https://www.amazon.com" + product.h2.a.get('href')
     product_price = product.find('span', {'class': 'a-offscreen'})
@@ -33,13 +30,10 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
     else:
         product_price = product_price.text
     products.append({'Product Name': product_name,
-                    'URL': product_url, 'Price': product_price})
-    # print(f"{idx+1}) Product Name: {product_name}, URL: {product_url}, Price: {product_price}")
-    # TODO: add ahrefs API to see ahrefs ratings for product_url
-    ahrefs_api_url_backlinks = f'{ahrefs_api_baseurl}/site-explorer/all-backlinks?target={product_url}'
-    ahrefs_response = requests.get(
-        ahrefs_api_url_backlinks, headers=ahrefs_headers)
-    print(ahrefs_response.json())
+                    'URL': product_url, 'Price': product_price, 'Sponsored': product_sponsored})
+    if idx + 1 == 20:
+        # Limit the number of results to 20
+        break
 
 df = pd.DataFrame(products)
 df.to_excel('amazon_products.xlsx', index=False)
