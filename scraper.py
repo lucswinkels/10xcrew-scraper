@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
-amazon_url = "https://www.amazon.com/s?k=earplugs&ref=nb_sb_noss"
+amazon_url = "https://www.amazon.com/s?k=office+chair&ref=nb_sb_noss"
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
