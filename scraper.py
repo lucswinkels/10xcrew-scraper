@@ -18,7 +18,7 @@ amazon_response = requests.get(amazon_url, headers=headers)
 amazon_soup = BeautifulSoup(amazon_response.content, 'html.parser')
 
 products = []
-max_results = 20
+max_results = 50
 
 for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type': 's-search-result'})):
     position = idx + 1
@@ -35,7 +35,6 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
         product_price = product_price.text
     productpage_response = requests.get(product_url, headers=headers)
     time.sleep(1)
-    # 1s sleep = roughly 1 minutes 20 time spent running script
     productpage = BeautifulSoup(productpage_response.content, 'html.parser')
     canonical_link = productpage.find('link', {'rel': 'canonical'}).get('href')
     products.append({'Position': position, 'Product Name': product_name,
