@@ -3,7 +3,8 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
-amazon_url = "https://www.amazon.com/s?k=office+chair&ref=nb_sb_noss"
+search_term = "wireless+mouse"
+amazon_url = f'https://www.amazon.com/s?k={search_term}&ref=nb_sb_noss'
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
@@ -43,4 +44,4 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
         break
 
 df = pd.DataFrame(products)
-df.to_excel('amazon_products.xlsx', index=False)
+df.to_excel(f'{search_term}.xlsx', index=False)
