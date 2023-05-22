@@ -1,10 +1,13 @@
+# TODO: fix "amazon blocking" issue
+# TODO: speed up script process without getting blocked
+
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
-search_term = "wireless+mouse"
-amazon_url = f'https://www.amazon.com/s?k={search_term}&ref=nb_sb_noss'
+search_term = "laptop"
+amazon_url = f'https://www.amazon.de/s?k={search_term}&ref=nb_sb_noss'
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36',
@@ -28,7 +31,7 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
     else:
         product_sponsored = " "
     product_name = product.h2.a.text.strip()
-    product_url = "https://www.amazon.com" + product.h2.a.get('href')
+    product_url = "https://www.amazon.de" + product.h2.a.get('href')
     product_price = product.find('span', {'class': 'a-offscreen'})
     if product_price is None:
         product_price = 'Not available'
