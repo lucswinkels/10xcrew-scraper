@@ -28,7 +28,6 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
     else:
         product_sponsored = " "
     product_name = product.h2.a.text.strip()
-    product_url = "https://www.amazon.com" + product.h2.a.get('href')
     product_price = product.find('span', {'class': 'a-offscreen'})
     if product_price is None:
         product_price = 'Not available'
@@ -38,6 +37,7 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
     # time.sleep(1)
     # productpage = BeautifulSoup(productpage_response.content, 'html.parser')
     # canonical_link = productpage.find('link', {'rel': 'canonical'}).get('href')
+    product_url = "https://www.amazon.com" + product.h2.a.get('href')
     regex = r"&url=%2F(.*)%2Fdp%2F([A-Z0-9]+)%2F"
     matches = re.finditer(regex, product_url, re.MULTILINE)
     for matchNum, match in enumerate(matches, start=1):
@@ -47,10 +47,10 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
         groupNum = groupNum + 1
         print("Group {groupNum} found at {start}-{end}: {group}".format(groupNum=groupNum,
                                                                         start=match.start(groupNum), end=match.end(groupNum), group=match.group(groupNum)))
-    if matches:
+    if match:
         canonical_link = f'https://www.amazon.com/{match.group(1)}/dp/{match.group(2)}'
     else:
-        # TODO: slice everything after product id (before /ref)?
+        # TODO: fix non-matching canonical links
         canonical_link = product_url
     products.append({'Position': position, 'Product Name': product_name,
                     'URL': product_url, 'Price': product_price, 'Sponsored': product_sponsored, 'Canonical Link': canonical_link})
