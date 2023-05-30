@@ -2,9 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
-from urllib.parse import urlparse, urlunparse
 
-search_term = "earbuds"
+search_term = "office+chair"
 amazon_url = f'https://www.amazon.com/s?k={search_term}&ref=nb_sb_noss'
 
 headers = {
