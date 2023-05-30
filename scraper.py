@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
+from urllib.parse import urlparse, urlunparse
 
 search_term = "office+chair"
 amazon_url = f'https://www.amazon.com/s?k={search_term}&ref=nb_sb_noss'
@@ -21,6 +22,7 @@ amazon_soup = BeautifulSoup(amazon_response.content, 'html.parser')
 products = []
 max_results = 50
 
+direct_link = None  # Variable to store the direct link
 for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type': 's-search-result'})):
     position = idx + 1
     if product.find('a', {'class': 'puis-sponsored-label-text'}):
@@ -33,27 +35,29 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
         product_price = 'Not available'
     else:
         product_price = product_price.text
-    # productpage_response = requests.get(product_url, headers=headers)
-    # time.sleep(1)
-    # productpage = BeautifulSoup(productpage_response.content, 'html.parser')
-    # canonical_link = productpage.find('link', {'rel': 'canonical'}).get('href')
     product_url = "https://www.amazon.com" + product.h2.a.get('href')
     regex = r"&url=%2F(.*)%2Fdp%2F([A-Z0-9]+)%2F"
     matches = re.finditer(regex, product_url, re.MULTILINE)
+    match_found = False  # Flag to indicate if a match was found
     for matchNum, match in enumerate(matches, start=1):
+        match_found = True
         print("Match {matchNum} was found at {start}-{end}: {match}".format(
             matchNum=matchNum, start=match.start(), end=match.end(), match=match.group()))
-    for groupNum in range(0, len(match.groups())):
-        groupNum = groupNum + 1
-        print("Group {groupNum} found at {start}-{end}: {group}".format(groupNum=groupNum,
-                                                                        start=match.start(groupNum), end=match.end(groupNum), group=match.group(groupNum)))
-    if match:
+        for groupNum in range(0, len(match.groups())):
+            groupNum = groupNum + 1
+            print("Group {groupNum} found at {start}-{end}: {group}".format(groupNum=groupNum,
+                                                                            start=match.start(groupNum), end=match.end(groupNum), group=match.group(groupNum)))
         canonical_link = f'https://www.amazon.com/{match.group(1)}/dp/{match.group(2)}'
-    else:
-        # TODO: fix non-matching canonical links
+        products.append({'Position': position, 'Product Name': product_name,
+                        'URL': product_url, 'Price': product_price, 'Sponsored': product_sponsored, 'Canonical Link': canonical_link})
+        break
+    if not match_found:
         canonical_link = product_url
-    products.append({'Position': position, 'Product Name': product_name,
-                    'URL': product_url, 'Price': product_price, 'Sponsored': product_sponsored, 'Canonical Link': canonical_link})
+        products.append({'Position': position, 'Product Name': product_name,
+                         'URL': product_url, 'Price': product_price, 'Sponsored': product_sponsored, 'Canonical Link': canonical_link.split('/ref=')[0]})
+    if not direct_link:
+        direct_link = canonical_link
+
     if idx + 1 == max_results:
         break
 
