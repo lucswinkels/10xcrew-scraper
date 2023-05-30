@@ -4,7 +4,7 @@ import pandas as pd
 import re
 from urllib.parse import urlparse, urlunparse
 
-search_term = "office+chair"
+search_term = "earbuds"
 amazon_url = f'https://www.amazon.com/s?k={search_term}&ref=nb_sb_noss'
 
 headers = {
@@ -20,9 +20,9 @@ amazon_response = requests.get(amazon_url, headers=headers)
 amazon_soup = BeautifulSoup(amazon_response.content, 'html.parser')
 
 products = []
-max_results = 50
+max_results = 100
 
-direct_link = None  # Variable to store the direct link
+direct_link = None
 for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type': 's-search-result'})):
     position = idx + 1
     if product.find('a', {'class': 'puis-sponsored-label-text'}):
@@ -38,7 +38,7 @@ for idx, product in enumerate(amazon_soup.find_all('div', {'data-component-type'
     product_url = "https://www.amazon.com" + product.h2.a.get('href')
     regex = r"&url=%2F(.*)%2Fdp%2F([A-Z0-9]+)%2F"
     matches = re.finditer(regex, product_url, re.MULTILINE)
-    match_found = False  # Flag to indicate if a match was found
+    match_found = False
     for matchNum, match in enumerate(matches, start=1):
         match_found = True
         print("Match {matchNum} was found at {start}-{end}: {match}".format(
